@@ -1,0 +1,6 @@
+/build/
+
+# for debug
+*.ipynb
+*.wrl
+*.log

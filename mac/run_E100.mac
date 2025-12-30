@@ -1,0 +1,9 @@
+/run/initialize
+/control/verbose 1
+/run/verbose 1
+/event/verbose 0
+/tracking/verbose 0
+/gun/particle pi-
+/gun/energy 100 GeV
+/ana/output sim/E100.root
+/run/beamOn 1000

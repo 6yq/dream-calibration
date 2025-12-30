@@ -1,0 +1,21 @@
+/control/verbose 2
+
+/run/initialize
+
+/vis/open VRML2FILE
+
+# Some drivers support setting output file name explicitly
+# If your Geant4 supports it, uncomment one of these:
+#/vis/vrml/set/fileName sim/geometry.wrl
+#/vis/ogl/set/printMode sim/geometry.wrl
+
+/vis/scene/create
+/vis/scene/add/volume
+/vis/scene/add/axes 0 0 0 500 mm
+
+# Simple style for geometry inspection
+/vis/viewer/set/style wireframe
+/vis/viewer/set/lineSegmentsPerCircle 12
+
+/vis/drawVolume
+/vis/viewer/flush
