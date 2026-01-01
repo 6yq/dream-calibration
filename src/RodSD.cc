@@ -57,6 +57,10 @@ G4bool RodSD::ProcessHits(G4Step *step, G4TouchableHistory *) {
 
   // Cherenkov
   if (inCFiber) {
+    auto track = step->GetTrack();
+    double q = track->GetParticleDefinition()->GetPDGCharge();
+    if (q == 0.0) return true;
+
     const double nref = 1.458;
     const double eff = 0.9;
     double beta = pre->GetBeta();
