@@ -1,4 +1,6 @@
 /build/
+/.cache/
+/sim_pull/
 
 # for debug
 *.ipynb

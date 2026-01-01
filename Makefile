@@ -5,6 +5,7 @@ PARTICLE:=pi-
 
 SRC_DIR:=src
 INC_DIR:=include
+ROOT_CVT:=root/ConvertPhotonTree.c
 ROOT_MAC:=root/analysis.c
 
 BUILD_DIR:=build
@@ -26,7 +27,7 @@ OBJS:=$(patsubst $(SRC_DIR)/%.cc,$(OBJ_DIR)/%.o,$(SRCS))
 
 .PHONY: all builds vis sims analyze clean
 
-all: analyze
+all: analyze analyze_pull
 
 $(BUILD_DIR) $(OBJ_DIR) $(SIM_DIR) $(MAC_DIR) $(RES_DIR):
 	mkdir -p $@
@@ -61,6 +62,40 @@ $(SIM_DIR)/E%.root: $(BIN) $(MAC_DIR)/run_E%.mac | $(SIM_DIR)
 analyze: $(SIM_OUT) | $(RES_DIR)
 	root -l -b -q '$(ROOT_MAC)("$(SIM_DIR)","$(RES_DIR)")'
 
+# ========
+# 	PULL
+# ========
+
+PULL_DIR:=sim_pull
+B2_URL?=git@github.com:billkin-star/DREAM.git
+
+B2_CACHE:=.cache
+B2_BUILD:=$(B2_CACHE)/B2/build
+
+PULL_OUT:=$(addprefix $(PULL_DIR)/E,$(addsuffix .root,$(ENERGIES)))
+pull_sims:$(PULL_OUT)
+
+$(B2_CACHE)/.git:
+	@mkdir -p $(dir $@)
+	git clone --depth 1 $(B2_URL) $(B2_CACHE)
+
+$(PULL_DIR):
+	mkdir -p $@
+
+$(PULL_DIR)/E%.root: | $(B2_CACHE)/.git $(PULL_DIR)
+	cp -a $(B2_BUILD)/PhotonData_E$*GeV.root $@.tmp
+	root -l -b -q '$(ROOT_CVT)("$@.tmp","$@")'
+	rm $@.tmp
+
+RES_PULL_DIR:=results_pull
+$(RES_PULL_DIR):
+	mkdir -p $@
+
+analyze_pull: pull_sims | $(RES_PULL_DIR)
+	root -l -b -q '$(ROOT_MAC)("$(PULL_DIR)","$(RES_PULL_DIR)")'
+
 clean:
 	rm -rf $(BUILD_DIR) $(SIM_DIR) $(RES_DIR)
 	rm -f $(MAC_DIR)/run_E*.mac
+	rm -rf $(B2_CACHE)
+	rm -f $(PULL_DIR)/E*.root
