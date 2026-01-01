@@ -60,7 +60,7 @@ static inline void make_calib_canvas(TCanvas &c, const char *title,
 
   c.cd();
   gPad->SetLeftMargin(0.12);
-  gPad->SetRightMargin(0.03);
+  gPad->SetRightMargin(0.10);
   gPad->SetTopMargin(0.10);
   gPad->SetBottomMargin(0.12);
 
@@ -72,17 +72,30 @@ static inline void make_calib_canvas(TCanvas &c, const char *title,
   fline->SetLineWidth(3);
   fline->Draw("same");
 
-  auto *leg = new TLegend(0.12, 0.78, 0.94, 0.92);
+  const double marginL = gPad->GetLeftMargin();
+  const double marginT = gPad->GetTopMargin();
+  const double w = 0.32;
+  const double hh = 0.24;
+
+  const double x1 = marginL + 0.03;
+  const double x2 = x1 + w;
+  const double y2 = 1.0 - marginT;
+  const double y1 = y2 - hh;
+
+  auto *leg = new TLegend(x1, y1, x2, y2);
   leg->SetBorderSize(1);
   leg->SetFillStyle(0);
   leg->SetTextSize(0.032);
+  leg->SetTextFont(42);
+
   leg->AddEntry(gr, "data", "p");
+  leg->AddEntry(fline, "fit: E = a#timesMean + b", "l");
+  leg->AddEntry((TObject *)0, Form("a=%.3g #pm %.3g", out.a, out.aErr), "");
+  leg->AddEntry((TObject *)0, Form("b=%.3g #pm %.3g", out.b, out.bErr), "");
   leg->AddEntry(
-      fline,
-      Form("#splitline{fit: E=a#timesMean+b;  a=%.6g#pm%.2g, b=%.6g#pm%.2g}"
-           "{#chi^{2}/ndf=%.1f/%d, p=%.3g}",
-           out.a, out.aErr, out.b, out.bErr, out.chi2, out.ndf, out.prob),
-      "l");
+      (TObject *)0,
+      Form("#chi^{2}/ndf=%.1f/%d, p=%.3g", out.chi2, out.ndf, out.prob), "");
+
   leg->Draw();
 
   gPad->Modified();
@@ -145,19 +158,32 @@ static inline void make_res_canvas(TCanvas &c, const char *title,
   fres->SetLineWidth(3);
   fres->Draw("same");
 
-  auto *leg = new TLegend(0.12, 0.78, 0.94, 0.92);
+  const double marginR = gPad->GetRightMargin();
+  const double marginT = gPad->GetTopMargin();
+  const double w = 0.32;
+  const double hh = 0.24;
+
+  const double x2 = 1.0 - marginR;
+  const double x1 = x2 - w;
+  const double y2 = 1.0 - marginT;
+  const double y1 = y2 - hh;
+
+  auto *leg = new TLegend(x1, y1, x2, y2);
   leg->SetBorderSize(1);
   leg->SetFillStyle(0);
-  leg->SetTextSize(0.032);
+  leg->SetTextSize(0.030);
+  leg->SetTextFont(42);
+
   leg->AddEntry(gr, "data", "p");
+  leg->AddEntry(fres, "fit: #sqrt{(#alpha/#sqrt{E})^{2} + #beta^{2}}", "l");
+  leg->AddEntry((TObject *)0,
+                Form("#alpha=%.3g #pm %.3g", out.alpha, out.alphaErr), "");
+  leg->AddEntry((TObject *)0,
+                Form("#beta=%.3g #pm %.3g", out.beta, out.betaErr), "");
   leg->AddEntry(
-      fres,
-      Form("#splitline{fit: #sqrt{(#alpha/#sqrt{E})^{2} + #beta^{2}};  "
-           "#alpha=%.4g#pm%.2g, #beta=%.4g#pm%.2g}"
-           "{#chi^{2}/ndf=%.1f/%d, p=%.3g}",
-           out.alpha, out.alphaErr, out.beta, out.betaErr, out.chi2, out.ndf,
-           out.prob),
-      "l");
+      (TObject *)0,
+      Form("#chi^{2}/ndf=%.1f/%d, p=%.3g", out.chi2, out.ndf, out.prob), "");
+
   leg->Draw();
 
   gPad->Modified();

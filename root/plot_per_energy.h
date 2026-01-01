@@ -17,20 +17,26 @@ static inline void add_fit_legend(TLegend *leg, TF1 *fFull, const FitInfo &FF,
                                   long long Nprime) {
   leg->SetBorderSize(1);
   leg->SetFillStyle(0);
-  leg->SetTextSize(0.032);
+  leg->SetTextSize(0.030);
 
-  leg->AddEntry(fFull,
-                Form("#splitline{Full (solid): #mu=%.4g, #sigma=%.4g}"
-                     "{#chi^{2}/ndf=%.1f/%d, p=%.3g}",
-                     FF.mu, FF.sigma, FF.chi2, FF.ndf, FF.prob),
-                "l");
+  leg->SetTextFont(42);
+  const char *MU = "#font[122]{m}";
+
+  leg->AddEntry(fFull, "Full data", "l");
+  leg->AddEntry((TObject *)0, Form("%s=%.4g, #sigma=%.4g", MU, FF.mu, FF.sigma),
+                "");
+  leg->AddEntry((TObject *)0,
+                Form("#chi^{2}/ndf=%.1f/%d, p=%.3g", FF.chi2, FF.ndf, FF.prob),
+                "");
 
   leg->AddEntry(fPeak,
-                Form("#splitline{Peak (dashed): N'=%lld, #mu=%.4g, #sigma=%.4g}"
-                     "{#chi^{2}/ndf=%.1f/%d, p=%.3g}",
-                     (long long)Nprime, FP.mu, FP.sigma, FP.chi2, FP.ndf,
-                     FP.prob),
+                Form("Peak (%s#pm1.5#sigma): N'=%lld", MU, (long long)Nprime),
                 "l");
+  leg->AddEntry((TObject *)0,
+                Form("%s'=%.4g, #sigma'=%.4g", MU, FP.mu, FP.sigma), "");
+  leg->AddEntry((TObject *)0,
+                Form("#chi^{2}/ndf=%.1f/%d, p=%.3g", FP.chi2, FP.ndf, FP.prob),
+                "");
 }
 
 static inline void draw_one_energy_page(TCanvas &c, const OneEnergy &d,
@@ -125,7 +131,7 @@ static inline void draw_one_energy_page(TCanvas &c, const OneEnergy &d,
                       const char *title) {
     c.cd(ipad);
     gPad->SetLeftMargin(0.12);
-    gPad->SetRightMargin(0.03);
+    gPad->SetRightMargin(0.10);
     gPad->SetTopMargin(0.12);
     gPad->SetBottomMargin(0.12);
 
@@ -134,7 +140,27 @@ static inline void draw_one_energy_page(TCanvas &c, const OneEnergy &d,
     fFull.Draw("same");
     fPeak.Draw("same");
 
-    auto *leg = new TLegend(0.52, 0.62, 0.94, 0.88);
+    double marginR = 0.10;
+    double marginT = 0.12;
+    double marginL = 0.15;
+    double w = 0.36;
+    double hh = 0.36;
+
+    double x2 = 1.0 - marginR;
+    double y2 = 1.0 - marginT;
+    double x1 = x2 - w;
+    double y1 = y2 - hh;
+
+    if (ipad == 2) {
+      x1 = marginL;
+      x2 = x1 + w;
+    } else {
+      x2 = 1.0 - marginR;
+      x1 = x2 - w;
+    }
+
+    auto *leg = new TLegend(x1, y1, x2, y2);
+
     leg->SetHeader(Form("N=%d", N), "");
     add_fit_legend(leg, &fFull, FF, &fPeak, FP, Np);
     leg->Draw();

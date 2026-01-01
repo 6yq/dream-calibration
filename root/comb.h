@@ -1,6 +1,7 @@
 #pragma once
 #include "bins.h"
 #include "fit.h"
+#include "plot_per_energy.h"
 #include "types.h"
 
 #include "TCanvas.h"
@@ -146,24 +147,24 @@ static inline void fit_vector_gaus_and_draw(
     fFull.Draw("same");
     fPeak.Draw("same");
 
-    auto *leg = new TLegend(0.50, 0.62, 0.94, 0.88);
+    const double marginL = gPad->GetLeftMargin();
+    const double marginT = gPad->GetTopMargin();
+    const double w = 0.34;
+    const double hh = 0.36;
+
+    const double x1_leg = marginL + 0.03;
+    const double x2_leg = x1_leg + w;
+    const double y2_leg = 1.0 - marginT;
+    const double y1_leg = y2_leg - hh;
+
+    auto *leg = new TLegend(x1_leg, y1_leg, x2_leg, y2_leg);
     leg->SetHeader(Form("w*=%.4g", out_w), "");
     leg->SetBorderSize(1);
     leg->SetFillStyle(0);
-    leg->SetTextSize(0.032);
+    leg->SetTextSize(0.030);
+    leg->SetTextFont(42);
 
-    leg->AddEntry(&fPeak,
-                  Form("#splitline{Peak: #mu=%.4g, #sigma=%.4g, N'=%lld}"
-                       "{#chi^{2}/ndf=%.1f/%d, p=%.3g}",
-                       F.peak.mu, F.peak.sigma, (long long)F.Nprime,
-                       F.peak.chi2, F.peak.ndf, F.peak.prob),
-                  "l");
-
-    leg->AddEntry((TObject *)0,
-                  Form("#splitline{biasS=%.3g, biasC=%.3g}{VarS=%.3g, "
-                       "VarC=%.3g, Cov=%.3g}",
-                       mm.biasS, mm.biasC, mm.vS, mm.vC, mm.covSC),
-                  "");
+    add_fit_legend(leg, &fFull, F.full, &fPeak, F.peak, F.Nprime);
 
     leg->Draw();
     c.Print(pdfName.c_str());
