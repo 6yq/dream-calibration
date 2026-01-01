@@ -42,7 +42,7 @@ $
 $
 再次拟合，并把这次（peak-fit）的 $\mu,\sigma$ 作为后续分析输入。
 
-拟合使用 unbinned 极大似然。
+拟合使用 binned 极大似然，每个分 bin 的计数认为是泊松，即 $\sqrt{N}$。
 
 ### 分辨率
 
@@ -96,4 +96,5 @@ $$
 - S/C/Comb 的标定参数 $a,b$ 及误差、$\chi^2/\mathrm{ndf}$、$p$
 - S/C/Comb 的分辨率拟合参数 $\alpha,\beta$ 及误差、$\chi^2/\mathrm{ndf}$、$p$
 - 每个能点的 $\omega_{\mathrm{opt}}$、$\mu/\sigma$（S/C/Comb）以及 comb 峰区 $N'$
+- 在极小化 MSE 时各项估计量的误差、方差和协方差
 - 每个能点的分辨率数值与误差：$E,\ (\Delta E/E)_S,\ \mathrm{err}_S,\ (\Delta E/E)_C,\ \mathrm{err}_C,\ (\Delta E/E)_{\mathrm{comb}},\ \mathrm{err}_{\mathrm{comb}}$
